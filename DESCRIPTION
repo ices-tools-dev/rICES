@@ -1,0 +1,16 @@
+Package: ices
+Title: Functions for the International Council for the Exploration
+    of the Seas (ICES)
+Version: 0.0.0.9000
+Authors@R: "Scott Large <scott.large@ICES.dk> [aut, cre]"
+Description: This package provides general-purpose functions that extracts
+    survey data and spatial layers from the ICES DATRAS Web Service APIs and
+    calculates frequently used spatially aggregated survey indices.
+Depends: R (>= 3.1.1)
+License: What license is it under?
+LazyData: true
+Imports:
+    XML,
+    doParallel,
+    parallel,
+    foreach
