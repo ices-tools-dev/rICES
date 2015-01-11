@@ -13,5 +13,9 @@ Imports:
     doParallel,
     foreach,
     parallel,
+<<<<<<< HEAD
     XML,
     ggplot2
+=======
+    XML
+>>>>>>> 101dd2d2338ed3c79f4eb67fc34bb7437f715817
