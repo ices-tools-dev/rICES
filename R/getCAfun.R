@@ -19,10 +19,12 @@ getCAfun <- function(survey, startyear, endyear, startquarter, endquarter, paral
   seqYear <- startyear:endyear
   seqQuarter <- startquarter:endquarter
   #
-  getCAurl <- paste0("http://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata",
-                     "?survey=", survey,
-                     "&year=", seqYear,
-                     "&quarter=", seqQuarter)
+  getCAurl <- apply(expand.grid(survey, seqYear, seqQuarter),
+                    1,
+                    function(x) paste0("http://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata",
+                                       "?survey=", x[1],
+                                       "&year=", x[2],
+                                       "&quarter=", x[3]))
   strt <- Sys.time()
   if(parallel == TRUE) {
     #
