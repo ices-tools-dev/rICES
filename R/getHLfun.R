@@ -17,10 +17,12 @@ getHLfun <- function(survey, startyear, endyear, startquarter, endquarter, paral
   seqYear <- startyear:endyear
   seqQuarter <- startquarter:endquarter
   #
-  getHLurl <- paste0("http://datras.ices.dk/WebServices/DATRASWebService.asmx/getHLdata",
-                     "?survey=", survey,
-                     "&year=", seqYear,
-                     "&quarter=", seqQuarter)
+  getHLurl <- apply(expand.grid(survey, seqYear, seqQuarter),
+                    1,
+                    function(x) paste0("http://datras.ices.dk/WebServices/DATRASWebService.asmx/getHLdata",
+                                       "?survey=", x[1],
+                                       "&year=", x[2],
+                                       "&quarter=", x[3]))
   #
   strt <- Sys.time()
   if(parallel == TRUE) {
@@ -47,7 +49,8 @@ getHLfun <- function(survey, startyear, endyear, startquarter, endquarter, paral
       return(xmlHL)
       stopCluster(cl)
     } # close parallel
-  } else {
+  }
+  if(parallel == FALSE) {
     getHL <- foreach(temp = getHLurl, .combine=rbind, .packages = "XML" ) %do% { #%dopar% parallel %do% sequential
       xmlHL <- data.frame(t(xmlSApply(xmlRoot(xmlTreeParse(temp, isURL = T, options = HUGE, useInternalNodes =  T)),
                                       function(x) xmlSApply(x, xmlValue))),
