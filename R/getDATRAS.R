@@ -6,16 +6,16 @@
 #' @export
 
 getDATRAS <- function(surveyName, startYear, endYear, startQuarter, endQuarter, dataDir = "~/", inParallel = FALSE) {
-  if(paste0("allDATRAS_", startYear, "-", endYear, ".Rdata") %in% list.files(dataDir)) {
-    cat("Hold on!!! \n \n",
-        paste0("allDATRAS_", startYear, "-", endYear, ".Rdata"),
-        " is located within ",
-        dataDir,
-        "\n Try load(",
-        paste0("allDATRAS_", startYear, "-", endYear, ".Rdata"),
-        ") to continue.")
-
-  } else {
+#   if(paste0("allDATRAS_", startYear, "-", endYear, ".Rdata") %in% list.files(dataDir)) {
+#     cat("Hold on!!! \n \n",
+#         paste0("allDATRAS_", startYear, "-", endYear, ".Rdata"),
+#         " is located within ",
+#         dataDir,
+#         "\n Try load(",
+#         paste0("allDATRAS_", startYear, "-", endYear, ".Rdata"),
+#         ") to continue.")
+#
+#   } else {
     # Reading the data can take some time, so the process is split and saved into 5 yr blocks in case there is a problem
     # with a connection and the process must be restarted. In that case, change the startYear accordingly.
     hhFile <- list()
@@ -35,9 +35,13 @@ getDATRAS <- function(surveyName, startYear, endYear, startQuarter, endQuarter, 
                       startquarter = startQuarter,
                       endquarter = endQuarter,
                       parallel = inParallel)
-      hhPath <- paste0(dataDir, "/HH_", START, "-", END,".Rdata")
+#       hhPath <- paste0("HH_", START, "-", END)
+      hhPath <- paste0(dataDir, "/HH_", START, "-", END, ".Rdata")
       save(tHH, file = hhPath)
-      hhFile <- c(hhFile, hhPath)
+      rm(tHH)
+      gc(verbose = TRUE)
+#       assign(hhPath, tHH)
+      hhFile <- rbind(hhFile, hhPath)
       #
       tHL <- getHLfun(survey = surveyName,
                       startyear = START,
@@ -45,9 +49,13 @@ getDATRAS <- function(surveyName, startYear, endYear, startQuarter, endQuarter, 
                       startquarter = startQuarter,
                       endquarter = endQuarter,
                       parallel = inParallel)
+#       hlPath <-  paste0("HL_", START, "-", END)
       hlPath <-  paste0(dataDir, "/HL_", START, "-", END, ".Rdata")
       save(tHL, file = hlPath)
-      hlFile <- c(hlFile, hlPath)
+      rm(tHL)
+      gc(verbose = TRUE)
+#       assign(hlPath, tHL)
+      hlFile <- rbind(hlFile, hlPath)
       #
       tCA <- getCAfun(survey = surveyName,
                       startyear = START,
@@ -55,9 +63,13 @@ getDATRAS <- function(surveyName, startYear, endYear, startQuarter, endQuarter, 
                       startquarter = startQuarter,
                       endquarter = endQuarter,
                       parallel = inParallel)
+#       caPath <- paste0("CA_", START, "-", END)
       caPath <- paste0(dataDir, "/CA_", START, "-", END, ".Rdata")
+#       assign(caPath, tCA)
       save(tCA, file = caPath)
-      caFile <- c(caFile, caPath)
+      rm(tCA)
+      gc(verbose = TRUE)
+      caFile <- rbind(caFile, caPath)
       #
       START <- END + 1
     }
@@ -66,8 +78,8 @@ getDATRAS <- function(surveyName, startYear, endYear, startQuarter, endQuarter, 
     HLrecs <- do.call(rbind, lapply(hlFile, function(x) get(load(x))))
     CArecs <- do.call(rbind, lapply(caFile, function(x) get(load(x))))
 
-    save(HHrecs, CArecs, HLrecs, file = paste0(dataDir, "/allDATRAS_", startYear, "-", endYear, ".Rdata"))
-    return(list(HHrecs, HLrecs, CArecs))
-  }
+    save(HHrecs, HLrecs, CArecs, file = paste0(dataDir, "/allDATRAS_", startYear, "-", endYear, ".Rdata"))
+#     return(list(HHrecs = HHrecs, HLrecs = HLrecs, CArecs = CArecs))
+#   }
 }
 

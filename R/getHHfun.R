@@ -24,7 +24,7 @@ getHHfun <- function(survey, startyear, endyear, startquarter, endquarter, paral
                                        "?survey=", x[1],
                                        "&year=", x[2],
                                        "&quarter=", x[3]))
-  strt <- Sys.time()
+    strt <- Sys.time()
   if(parallel == TRUE) {
     cl <- makeCluster(2)
     registerDoParallel(cores = cl)
@@ -47,7 +47,8 @@ getHHfun <- function(survey, startyear, endyear, startquarter, endquarter, paral
       return(xmlHH)
       stopCluster(cl)
     } # close parallel
-  } else {
+  }
+  if(parallel == FALSE) {
     getHH <- foreach(temp = getHHurl, .combine=rbind, .packages = "XML" ) %do% { #%dopar% parallel %do% sequential
       xmlHH <- data.frame(t(xmlSApply(xmlRoot(xmlTreeParse(temp, isURL = T, options = HUGE, useInternalNodes =  T)),
                                       function(x) xmlSApply(x, xmlValue))),

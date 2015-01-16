@@ -52,7 +52,8 @@ getCAfun <- function(survey, startyear, endyear, startquarter, endquarter, paral
       return(xmlCA)
       stopCluster(cl)
     }
-  } else {
+  }
+  if(parallel == FALSE) {
     getCA <- foreach(temp = getCAurl, .combine=rbind, .packages = "XML" ) %do% { #%dopar% parallel %do% sequential
       xmlCA <- data.frame(t(xmlSApply(xmlRoot(xmlTreeParse(temp, isURL = T, options = HUGE, useInternalNodes =  T)),
                                       function(x) xmlSApply(x, xmlValue))),
