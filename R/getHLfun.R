@@ -1,8 +1,15 @@
-#' Datras Function
-#'
-#' More descriptive name
-#' @param x
+#' getHLfun.R
+
+#' Extracts length data files from DATRAS
+#' @param survey, startyear, endyear, startquarter, endquarter, parallel = FALSE
 #' @return none
+#' @seealso \code{\link{cacheDATRAS}}, a\code{\link{loadDATRAS}}, \code{\link{getCAfun}}, and \code{\link{getHHfun}}
+#' @details the update is slow, avoiding straining the server or client.
+#'   please allow this call to run overnight for a complete upgrade.
+#' @keywords download, DATRAS, survey, age
+#' @examples \dontrun{
+#'  getHLfun()
+#' }
 #' @export
 
 ###########################################################################
@@ -26,8 +33,10 @@ getHLfun <- function(survey, startyear, endyear, startquarter, endquarter, paral
   #
   strt <- Sys.time()
   if(parallel == TRUE) {
-    cl <- makeCluster(2)
+    cl <- makeCluster(detectCores())
     registerDoParallel(cores = cl)
+    on.exit(stopCluster(cl))
+
     getHL <- foreach(temp = getHLurl, .combine=rbind, .packages = "XML" ) %dopar% { #%dopar% parallel %do% sequential
       xmlHL <- data.frame(t(xmlSApply(xmlRoot(xmlTreeParse(temp, isURL = T, options = HUGE, useInternalNodes =  T)),
                                       function(x) xmlSApply(x, xmlValue))),

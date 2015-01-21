@@ -2,18 +2,36 @@
 % Please edit documentation in R/getHHfun.R
 \name{getHHfun}
 \alias{getHHfun}
-\title{Haul function}
+\title{getHHfun.R
+Extracts haul data files from DATRAS}
 \usage{
 getHHfun(survey, startyear, endyear, startquarter, endquarter,
   parallel = FALSE)
 }
 \arguments{
-\item{survey,}{startyear, endyear, startquarter, endquarter, parallel}
+\item{survey,}{startyear, endyear, startquarter, endquarter, parallel = FALSE}
 }
 \value{
 none
 }
 \description{
-More descriptive name
+getHHfun.R
+Extracts haul data files from DATRAS
 }
+\details{
+the update is slow, avoiding straining the server or client.
+  please allow this call to run overnight for a complete upgrade.
+}
+\examples{
+\dontrun{
+ getHHfun()
+}
+}
+\seealso{
+\code{\link{cacheDATRAS}}, a\code{\link{loadDATRAS}}, \code{\link{getHLfun}}, and \code{\link{getCAfun}}
+}
+\keyword{DATRAS,}
+\keyword{age}
+\keyword{download,}
+\keyword{survey,}
 

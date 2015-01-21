@@ -2,18 +2,36 @@
 % Please edit documentation in R/getHLfun.R
 \name{getHLfun}
 \alias{getHLfun}
-\title{Datras Function}
+\title{getHLfun.R
+Extracts length data files from DATRAS}
 \usage{
 getHLfun(survey, startyear, endyear, startquarter, endquarter,
   parallel = FALSE)
 }
 \arguments{
-\item{x}{}
+\item{survey,}{startyear, endyear, startquarter, endquarter, parallel = FALSE}
 }
 \value{
 none
 }
 \description{
-More descriptive name
+getHLfun.R
+Extracts length data files from DATRAS
 }
+\details{
+the update is slow, avoiding straining the server or client.
+  please allow this call to run overnight for a complete upgrade.
+}
+\examples{
+\dontrun{
+ getHLfun()
+}
+}
+\seealso{
+\code{\link{cacheDATRAS}}, a\code{\link{loadDATRAS}}, \code{\link{getCAfun}}, and \code{\link{getHHfun}}
+}
+\keyword{DATRAS,}
+\keyword{age}
+\keyword{download,}
+\keyword{survey,}
 

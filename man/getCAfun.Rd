@@ -2,18 +2,36 @@
 % Please edit documentation in R/getCAfun.R
 \name{getCAfun}
 \alias{getCAfun}
-\title{Datras Function}
+\title{getCAfun.R
+Extracts age data files from DATRAS}
 \usage{
 getCAfun(survey, startyear, endyear, startquarter, endquarter,
   parallel = FALSE)
 }
 \arguments{
-\item{x}{}
+\item{survey,}{startyear, endyear, startquarter, endquarter, parallel = FALSE}
 }
 \value{
 none
 }
 \description{
-More descriptive name
+getCAfun.R
+Extracts age data files from DATRAS
 }
+\details{
+the update is slow, avoiding straining the server or client.
+  please allow this call to run overnight for a complete upgrade.
+}
+\examples{
+\dontrun{
+ getCAfun()
+}
+}
+\seealso{
+\code{\link{cacheDATRAS}}, a\code{\link{loadDATRAS}}, \code{\link{getHLfun}}, and \code{\link{getHHfun}}
+}
+\keyword{DATRAS,}
+\keyword{age}
+\keyword{download,}
+\keyword{survey,}
 

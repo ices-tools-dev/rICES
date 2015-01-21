@@ -1,8 +1,15 @@
-#' Haul function
-#'
-#' More descriptive name
-#' @param survey, startyear, endyear, startquarter, endquarter, parallel
+#' getHHfun.R
+
+#' Extracts haul data files from DATRAS
+#' @param survey, startyear, endyear, startquarter, endquarter, parallel = FALSE
 #' @return none
+#' @seealso \code{\link{cacheDATRAS}}, a\code{\link{loadDATRAS}}, \code{\link{getHLfun}}, and \code{\link{getCAfun}}
+#' @details the update is slow, avoiding straining the server or client.
+#'   please allow this call to run overnight for a complete upgrade.
+#' @keywords download, DATRAS, survey, age
+#' @examples \dontrun{
+#'  getHHfun()
+#' }
 #' @export
 
 
@@ -26,8 +33,11 @@ getHHfun <- function(survey, startyear, endyear, startquarter, endquarter, paral
                                        "&quarter=", x[3]))
     strt <- Sys.time()
   if(parallel == TRUE) {
-    cl <- makeCluster(2)
+    #
+    cl <- makeCluster(detectCores())
     registerDoParallel(cores = cl)
+    on.exit(stopCluster(cl))
+    #
     getHH <- foreach(temp = getHHurl, .combine=rbind, .packages = "XML" ) %dopar% { #%dopar% parallel %do% sequential
       xmlHH <- data.frame(t(xmlSApply(xmlRoot(xmlTreeParse(temp, isURL = T, options = HUGE, useInternalNodes =  T)),
                                       function(x) xmlSApply(x, xmlValue))),

@@ -1,8 +1,15 @@
-#' Datras Function
-#'
-#' More descriptive name
-#' @param x
+#' getCAfun.R
+
+#' Extracts age data files from DATRAS
+#' @param survey, startyear, endyear, startquarter, endquarter, parallel = FALSE
 #' @return none
+#' @seealso \code{\link{cacheDATRAS}}, a\code{\link{loadDATRAS}}, \code{\link{getHLfun}}, and \code{\link{getHHfun}}
+#' @details the update is slow, avoiding straining the server or client.
+#'   please allow this call to run overnight for a complete upgrade.
+#' @keywords download, DATRAS, survey, age
+#' @examples \dontrun{
+#'  getCAfun()
+#' }
 #' @export
 
 
@@ -28,8 +35,9 @@ getCAfun <- function(survey, startyear, endyear, startquarter, endquarter, paral
   strt <- Sys.time()
   if(parallel == TRUE) {
     #
-    cl <- makeCluster(2)
+    cl <- makeCluster(detectCores())
     registerDoParallel(cores = cl)
+    on.exit(stopCluster(cl))
     #
     getCA <- foreach(temp = getCAurl, .combine=rbind, .packages = "XML" ) %dopar% { #%dopar% parallel %do% sequential
       xmlCA <- data.frame(t(xmlSApply(xmlRoot(xmlTreeParse(temp, isURL = T, options = HUGE, useInternalNodes =  T)),
@@ -50,9 +58,10 @@ getCAfun <- function(survey, startyear, endyear, startquarter, endquarter, paral
         #
       }
       return(xmlCA)
-      stopCluster(cl)
+#       stopCluster(cl)
     }
   }
+
   if(parallel == FALSE) {
     getCA <- foreach(temp = getCAurl, .combine=rbind, .packages = "XML" ) %do% { #%dopar% parallel %do% sequential
       xmlCA <- data.frame(t(xmlSApply(xmlRoot(xmlTreeParse(temp, isURL = T, options = HUGE, useInternalNodes =  T)),

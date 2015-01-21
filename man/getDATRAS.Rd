@@ -2,18 +2,37 @@
 % Please edit documentation in R/getDATRAS.R
 \name{getDATRAS}
 \alias{getDATRAS}
-\title{getDATRAS}
+\title{getDATRAS.R
+Download files from DATRAS}
 \usage{
 getDATRAS(surveyName, startYear, endYear, startQuarter, endQuarter,
-  dataDir = "~/", inParallel = FALSE)
+  path = ".", inParallel = FALSE)
 }
 \arguments{
-\item{surveyName,}{startYear, endYear, startQuarter, endQuarter, dataDir = "~/", inParallel}
+\item{surveyName,}{startYear, endYear, startQuarter, endQuarter, path = "~/", inParallel}
 }
 \value{
 none
 }
 \description{
+getDATRAS.R
 Download files from DATRAS
 }
+\details{
+the update is slow, avoiding straining the server or client.
+  please allow this call to run overnight for a complete upgrade.
+}
+\examples{
+\dontrun{
+ getDATRAS(surveyName = "NS-IBTS", startYear = 2005, endYear = 2006, startQuarter = 1,
+ endQuarter = 4, path = ".", inParallel = TRUE)
+}
+}
+\seealso{
+\code{\link{cacheDATRAS}}, a\code{\link{loadDATRAS}}, \code{\link{getCAfun}},
+\code{\link{getHLfun}}, and \code{\link{getHHfun}}
+}
+\keyword{DATRAS,}
+\keyword{download,}
+\keyword{survey\}
 
