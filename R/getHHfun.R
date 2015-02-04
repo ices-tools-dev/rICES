@@ -11,16 +11,16 @@
 #'  getHHfun()
 #' }
 #' @export
-
-
-
+#
 ###########################################################################
-getHHfun <- function(survey, startyear, endyear, startquarter, endquarter, parallel = FALSE){
-  # Downloads and parses XML haul data from ICES DATRAS
+getHHfun <- function(survey, startyear, endyear, startquarter, endquarter, parallel = FALSE) {
   #   library(XML)
   #   library(doParallel)
   #   library(parallel)
   #   library(foreach)
+  #   library(data.table)
+  strt <- Sys.time()
+
   #
   seqYear <- startyear:endyear
   seqQuarter <- startquarter:endquarter
@@ -31,54 +31,36 @@ getHHfun <- function(survey, startyear, endyear, startquarter, endquarter, paral
                                        "?survey=", x[1],
                                        "&year=", x[2],
                                        "&quarter=", x[3]))
-    strt <- Sys.time()
+  #
   if(parallel == TRUE) {
-    #
+    unregister <- function() {
+      env <- foreach:::.foreachGlobals
+      rm(list=ls(name=env), pos=env)
+    } # close unregister
+
     cl <- makeCluster(detectCores())
     registerDoParallel(cores = cl)
-    on.exit(stopCluster(cl))
     #
-    getHH <- foreach(temp = getHHurl, .combine=rbind, .packages = "XML" ) %dopar% { #%dopar% parallel %do% sequential
-      xmlHH <- data.frame(t(xmlSApply(xmlRoot(xmlTreeParse(temp, isURL = T, options = HUGE, useInternalNodes =  T)),
-                                      function(x) xmlSApply(x, xmlValue))),
-                          row.names = NULL,
-                          stringsAsFactors = F)
-      if(length(xmlHH) > 1){ # Not all quarters are sampled
-        # Data wrangling to make sure -9 = NA and numbers are numeric
-        xmlHH <- data.frame(lapply(xmlHH, function(x) gsub("[[:space:]]","", x)), stringsAsFactors = FALSE)[,1:29]
-        #
-        HHnumCols <- c("Quarter", "SweepLngt", "StNo", "HaulNo", "Year", "month", "Day", "TimeShot", "Stratum",
-                       "HaulDur", "ShootLat", "ShootLong", "HaulLat", "HaulLong", "Depth", "HydroStNo",
-                       "StdSpecRecCode", "Netopening", "Rigging", "Tickler")
-        xmlHH[HHnumCols] <- suppressWarnings(sapply(xmlHH[HHnumCols], as.numeric)) # Warning here is OK but silenced
-        xmlHH[xmlHH == "-9" |
-                xmlHH < -9] <- NA
-      }
-      return(xmlHH)
-      stopCluster(cl)
-    } # close parallel
-  }
+
+    getHH <- foreach(temp = getHHurl,
+                     .combine = function(...) rbindlist(list(...), fill = TRUE),
+                     .packages = c("XML", "data.table")) %dopar% {
+                       data.table(t(xmlSApply(xmlRoot(xmlTreeParse(temp, isURL = T, options = HUGE, useInternalNodes =  T)),
+                                              function(x) xmlSApply(x, xmlValue))))
+                     } # close foreach
+    stopCluster(cl)
+    unregister()
+  } # close parallel
+  #
   if(parallel == FALSE) {
-    getHH <- foreach(temp = getHHurl, .combine=rbind, .packages = "XML" ) %do% { #%dopar% parallel %do% sequential
-      xmlHH <- data.frame(t(xmlSApply(xmlRoot(xmlTreeParse(temp, isURL = T, options = HUGE, useInternalNodes =  T)),
-                                      function(x) xmlSApply(x, xmlValue))),
-                          row.names = NULL,
-                          stringsAsFactors = F)
-      if(length(xmlHH) > 1){ # Not all quarters are sampled
-        # Data wrangling to make sure -9 = NA and numbers are numeric
-        xmlHH <- data.frame(lapply(xmlHH, function(x) gsub("[[:space:]]","", x)), stringsAsFactors = FALSE)[,1:29]
-        #
-        HHnumCols <- c("Quarter", "SweepLngt", "StNo", "HaulNo", "Year", "month", "Day", "TimeShot", "Stratum",
-                       "HaulDur", "ShootLat", "ShootLong", "HaulLat", "HaulLong", "Depth", "HydroStNo",
-                       "StdSpecRecCode", "Netopening", "Rigging", "Tickler")
-        xmlHH[HHnumCols] <- suppressWarnings(sapply(xmlHH[HHnumCols], as.numeric)) # Warning here is OK but silenced
-        xmlHH[xmlHH == "-9" |
-                xmlHH < -9] <- NA
-      }
-      return(xmlHH)
-    } # close sequential
+    getHH <- foreach(temp = getHHurl,
+                     .combine = function(...) rbindlist(list(...), fill = TRUE),
+                     .packages = c("XML", "data.table")) %do% {
+                       data.table(t(xmlSApply(xmlRoot(xmlTreeParse(temp, isURL = T, options = HUGE, useInternalNodes =  T)),
+                                              function(x) xmlSApply(x, xmlValue))))
+                     } # close foreach
   }
   print(Sys.time()-strt)
   return(getHH)
-}
-#
+
+} # close function
