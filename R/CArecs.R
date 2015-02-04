@@ -23,4 +23,4 @@
 #'   \item{carat}{weight of the diamond, in carats}
 #' }
 #' @source \url{https://datras.ices.dk/WebServices/Webservices.aspx}
-"CArecs"
+# "data/CA-26012015_NS-IBTS.Rdat"

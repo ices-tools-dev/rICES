@@ -30,5 +30,5 @@ getAreaName <- function(areaList) {
   }
   return(areaName)
 }
-allAreaName <- getAreaName(unique(aData$ICES_area))
-save(allAreaName, file = "ICESareaName_v001.Rdata")
+# allAreaName <- getAreaName(unique(aData$ICES_area))
+# save(allAreaName, file = "ICESareaName_v001.Rdata")

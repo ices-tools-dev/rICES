@@ -9,21 +9,15 @@ Description: This package provides general-purpose functions that extracts
 Depends: R (>= 3.1.1)
 License: What license is it under?
 LazyData: true
-<<<<<<< HEAD
-Imports: 
-=======
+Imports:
 VignetteBuilder: knitr
 Imports:
->>>>>>> a68b4a598530cd5ac116b87fd42c788e0a878d61
     doParallel,
     foreach,
     parallel,
     XML,
-<<<<<<< HEAD
+    data.table,
     ggplot2,
     XML
 Suggests: knitr
 VignetteBuilder: knitr
-=======
-    ggplot2
->>>>>>> a68b4a598530cd5ac116b87fd42c788e0a878d61
