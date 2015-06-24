@@ -1,9 +1,5 @@
----
-title: 'R for ICES: Linking R with DATRAS Web Services'
-author: "Scott Large"
-date: "Wednesday, June 24, 2015"
-output: html_document
----
+# R for ICES: Linking ICES data and advice, with R
+Scott Large
 
 ## Introduction
 Most of the advice that ICES provides relies heavily upon DATRAS and other ICES Data Centre products. The user interfaces of these products are well developed and very user friendly for point-and-click data exploration and accessing a few years or surveys. Users interested in accessing the data in a more transparent, reproducible, and streamlined way can use the following [R](http://cran.r-project.org/) code to download batches of surveys, years, and quarters.
