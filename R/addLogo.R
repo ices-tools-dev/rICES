@@ -34,10 +34,26 @@
 #'  plot(1:2,type="n")
 #'  icesLogo(logoType = "fullText", x = 0.5, y = 0.5, size = 1, alpha = .1)
 #'  dev.off()
+#'  
+#'  
+#'  png(filename = "~/rICESlogo.png",
+#'  width = 25.4,
+#'    height = 25.4,
+#'    units = "mm",
+#'    res = 600)
+#' par(mar = c(0, 0, 0, 0),
+#'    oma = c(0, 0, 0, 0))
+
+#'orange <- "#F15D2A"
+#'plot(x = 0.5, y = 0.64,type="p", pch = "R", cex = 4, col = orange, xlim = c(0,1), ylim = c(0,1), 
+#'     axes = F, bty = "n")
+#'icesLogo(logoType = "acronym", x = 0.5, y = 0.5, size = .55, alpha = .9)
+#'dev.off()
+
 #'}
 #' @export
 #
-addLogo <- function(logoType = c("acronym", "fullText"), x, y, size, alpha = 1) {
+icesLogo <- function(logoType = c("acronym", "fullText"), x, y, size, alpha = 1) {
   #
   needList <- c("RCurl", "extrafont")
   new.packages <- needList[!(needList %in% installed.packages()[,"Package"])]
