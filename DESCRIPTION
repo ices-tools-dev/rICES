@@ -1,18 +1,15 @@
-Package: ices
-Title: Functions for the International Council for the Exploration
-    of the Seas (ICES)
+Package: rICES
+Title: R for ICES: Linking ICES data, science, and advice with R
 Version: 0.0.0.9000
 Authors@R: c(person("Scott", "Large", role = c("aut", "cre"),
              email = "scott.large@ICES.dk"))
 Author: Scott Large [aut, cre]
 Maintainer: Scott Large <scott.large@ICES.dk>
-Description: This package provides general-purpose functions that extracts
-    survey data and spatial layers from the ICES DATRAS Web Service APIs and
-    calculates frequently used spatially aggregated survey indices.
+Description: This package provides general-purpose tools for aggregating data, calculating survey indices,
+    and compiling common ICES outputs.
 Depends: R (>= 3.1.1)
 License: What license is it under?
 LazyData: true
-Imports:
 VignetteBuilder: knitr
 Imports:
     doParallel,
@@ -24,6 +21,7 @@ Imports:
     RCurl,
     extrafont,
     FLCore,
-    png
+    png,
+    extrafont
 Suggests: knitr
 VignetteBuilder: knitr
