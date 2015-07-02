@@ -1,4 +1,4 @@
-#' addLogo.R
+#' icesLogo.R
 
 #' Adds ICES logo to a base R plot
 #' @param logoType = c("acronym", "fullText"), x, y, size, alpha = 1
@@ -55,12 +55,12 @@
 #
 icesLogo <- function(logoType = c("acronym", "fullText"), x, y, size, alpha = 1) {
   #
-  needList <- c("RCurl", "extrafont")
-  new.packages <- needList[!(needList %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  #
-  library(RCurl)
-  library(extrafont)
+#   needList <- c("RCurl", "extrafont")
+#   new.packages <- needList[!(needList %in% installed.packages()[,"Package"])]
+#   if(length(new.packages)) install.packages(new.packages)
+#   #
+#   library(RCurl)
+#   library(extrafont)
   #
   fontTable <- fonttable()
   if(!"Calibri" %in% fontTable$FamilyName) font_import(pattern="[C/c]alibri", prompt = FALSE)
