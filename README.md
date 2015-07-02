@@ -3,7 +3,7 @@ output: html_document
 ---
 # R for ICES: Linking ICES data, science, and advice with R
 
-![rICESLogo](rICESlogo.png)
+<img src="rICESlogo.png" height="100px" width="100px" />
 
 ## Introduction
 The International Council for the Exploration of the Seas (ICES; [ices.dk](http://www.ices.dk/)) is a global organization that develops science and advice to support the sustainable use of the oceans. ICES is a network of over 4000 scientists and efforts to aggregate, analyze, and explore the vast amount of data related to marine ecosystems and resources are extensive and ongoing. A multitude of code already exists on the harddrives of each scientist, however, much of the code (e.g., for aggregating data, calculating survey indices, and  common outputs) is unavailable to other users and efforts are likely overlapping. There is no need to reinvent the wheel and the impetus of the ICES GitHub and the (very much in development) rICES R package is to provide a platform for ICES scientists to share and contribute to the development of common tools and techniques to facilitate the ICES mission. 
@@ -107,12 +107,5 @@ icesLogo(logoType = "acronym", x = 0.5, y = 0.5, size = .25, alpha = 1)
 plot(1:2,type="n")
 icesLogo(logoType = "fullText", x = 0.5, y = 0.5, size = 1, alpha = .1)
 dev.off()
-
-orange <- "#F15D2A"
-
-plot(x = 0.4, y = 0.5,type="p", pch = "R", cex = 5, col = orange, add = T,
-xlim = c(0,1), ylim = c(0,1))
-icesLogo(logoType = "acronym", x = 0.5, y = 0.5, size = .25, alpha = 1)
-
 ```
 ![icesLogo Example](TESTlogo.png)

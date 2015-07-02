@@ -35,21 +35,34 @@
 #'  icesLogo(logoType = "fullText", x = 0.5, y = 0.5, size = 1, alpha = .1)
 #'  dev.off()
 #'  
-#'  
-#'  png(filename = "~/rICESlogo.png",
-#'  width = 25.4,
-#'    height = 25.4,
-#'    units = "mm",
-#'    res = 600)
+#'
+#' # devtools::install_github("ices-dk/rICES")
+#' library(rICES)
+#' library(extrafont)
+#' library(png)
+#' library(RCurl)
+#' 
+#' icesOrange <- "#F15D2A"
+#' 
+#' png(filename = "~/git/ices-dk/rICES/rICESlogo.png",
+#'     width = 25.4,
+#'     height = 25.4,
+#'     units = "mm",
+#'     res = 600)
+#
 #' par(mar = c(0, 0, 0, 0),
-#'    oma = c(0, 0, 0, 0))
-
-#'orange <- "#F15D2A"
-#'plot(x = 0.5, y = 0.64,type="p", pch = "R", cex = 4, col = orange, xlim = c(0,1), ylim = c(0,1), 
-#'     axes = F, bty = "n")
-#'icesLogo(logoType = "acronym", x = 0.5, y = 0.5, size = .55, alpha = .9)
-#'dev.off()
-
+#'     oma = c(0, 0, 0, 0),
+#'     family = "Calibri", # requires library(extrafont), but matches ICES Advice format
+#'     mgp = c(3, .35, 0))
+#' 
+#' plot(x = 0.55, y = 0.5, type="p", pch = "R", cex = 9, 
+#'      col = icesOrange, xlim = c(0,1), ylim = c(0,1),
+#'      axes = F, bty = "n")
+#' icesLogo(logoType = "acronym", x = 0.5, y = 0.5, size = .55, alpha = .9)
+#' #
+#' dev.off()
+#' 
+#' 
 #'}
 #' @export
 #
@@ -62,9 +75,9 @@ icesLogo <- function(logoType = c("acronym", "fullText"), x, y, size, alpha = 1)
 #   library(RCurl)
 #   library(extrafont)
   #
-  fontTable <- fonttable()
-  if(!"Calibri" %in% fontTable$FamilyName) font_import(pattern="[C/c]alibri", prompt = FALSE)
-  #
+#   fontTable <- fonttable()
+#   if(!"Calibri" %in% fontTable$FamilyName) font_import(pattern="[C/c]alibri", prompt = FALSE)
+#   #
   if(!logoType %in% c("acronym", "fullText")) stop("Must specify 'fullText' or 'acronym' logoType")
   if(logoType == "acronym") {
     imgURL <- "http://www.ices.dk/SiteCollectionImages/ICES%20logos/ICES-logo%20acronym%20PNG%20format.png"
