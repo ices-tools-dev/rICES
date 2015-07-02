@@ -1,30 +1,27 @@
 ---
 output: html_document
 ---
-<img align="center" src="D:\Profiles\Scott\My Documents\rICESlogo.png" alt="rICESLogo" style="width: 200px"/>
 # R for ICES: Linking ICES data, science, and advice with R
-Scott Large
+
+![rICESLogo](rICESlogo.png)
 
 ## Introduction
-The International Council for the Exploration of the Seas (ICES; [ices.dk](http://www.ices.dk/)) is a global organization that develops science and advice to support the sustainable use of the oceans. ICES is a network of over 4000 scientists and efforts to aggregate, analyze, and explore the vast amount of data related to marine ecosystems and resources are extensive and ongoing. A multitude of R code already exists on the harddrives of each scientist, however, much of the code (i.e., for aggregating data, calculating survey indices, and  common outputs) are likely overlapping. There is no need to reinvent the wheel and the impetus of the ICES GitHub and the (very much in development) rICES package is to provide a platform for ICES scientists to share and contribute to the development of common tools and techniques to facilitate the ICES mission. 
+The International Council for the Exploration of the Seas (ICES; [ices.dk](http://www.ices.dk/)) is a global organization that develops science and advice to support the sustainable use of the oceans. ICES is a network of over 4000 scientists and efforts to aggregate, analyze, and explore the vast amount of data related to marine ecosystems and resources are extensive and ongoing. A multitude of code already exists on the harddrives of each scientist, however, much of the code (e.g., for aggregating data, calculating survey indices, and  common outputs) is unavailable to other users and efforts are likely overlapping. There is no need to reinvent the wheel and the impetus of the ICES GitHub and the (very much in development) rICES R package is to provide a platform for ICES scientists to share and contribute to the development of common tools and techniques to facilitate the ICES mission. 
 
-Note: users of these products are subject to the [ICES Data Policy](http://www.ices.dk/marine-data/Documents/ICES_Data_Policy_2012.pdf) and the following code is provided without warranty and may be under further development. Please contribute to the development on GitHub ([github.com/ICES-dk](https://github.com/ICES-dk)) or contact the author directly <scott.large@ices.dk>.
+Note: users of ICES data products are subject to the [ICES Data Policy](http://www.ices.dk/marine-data/Documents/ICES_Data_Policy_2012.pdf). All code herein is provided without warranty and may be under further development. Please contribute to the development on GitHub ([github.com/ICES-dk](https://github.com/ICES-dk)) or contact the author directly <scott.large@ices.dk>.
+
+## Installation
+
+### Development version
+```r
+devtools::install_github("ICES-dk/rICES")
+library(rICES)
+```
 
 ## Interacting with the DATRAS API's
 Most of the advice that ICES provides relies heavily upon DATRAS and other ICES Data Centre products. The user interfaces of these products are well developed and very user friendly for point-and-click data exploration and accessing a few years or surveys. Users interested in accessing the data in a more transparent, reproducible, and streamlined way can use the following [R](http://cran.r-project.org/) code to download batches of surveys, years, and quarters.
 
 The following function interacts directly with the [ICES DATRAS WebServices](https://datras.ices.dk/WebServices/DATRASWebService.asmx) and is able to extract station data (HH), age data (CA), and length data (HL) and returns each record as an R object. Keep in mind that the speed of this function is limited by bandwidth availability and parsing XML can be a labor intensive task, especially for long time-series. The code is written to parse the XML using parallel processing, which can significantly reduce run-time. The full time series of North Sea IBTS length based data has ~ 3 million rows and can take 30+ minutes to download and parse in parallel.
-
-## Basic Usage
-
-Install the ICES R package and load it.
-
-```r
-require(devtools)
-install_github("ICES-dk/rICES")
-
-library(rICES)
-```
 
 ### Haul Data
 To download the haul meta-data from the first and third quarters in 2010 and 2011 of the North Sea International Bottom Trawl Survey, use the following code:
@@ -118,4 +115,4 @@ xlim = c(0,1), ylim = c(0,1))
 icesLogo(logoType = "acronym", x = 0.5, y = 0.5, size = .25, alpha = 1)
 
 ```
-![icesLogo Example](D:\Profiles\Scott\My Documents\TESTlogo.png)
+![icesLogo Example](TESTlogo.png)
