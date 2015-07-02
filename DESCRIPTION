@@ -7,8 +7,7 @@ Author: Scott Large [aut, cre]
 Maintainer: Scott Large <scott.large@ICES.dk>
 Description: This package provides general-purpose tools for aggregating data, calculating survey indices,
     and compiling common ICES outputs.
-Depends: 
-    R (>= 3.1.1), 
+Depends: R (>= 3.1.1), 
     doParallel,
     foreach,
     parallel,
@@ -17,8 +16,7 @@ Depends:
     RCurl,
     FLCore,
     png 
-Suggests:
-    ggplot2, 
+Suggests: ggplot2, 
     extrafont   
 License: What license is it under?
 LazyData: true
