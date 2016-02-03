@@ -1,11 +1,19 @@
-# Download and read data from the ICES Spatial Facility. Reads ICES Statistical areas, ICES Statistical Rectangles, 
-# ICES Ecoregions, HELCOM sub-basins, or OSPAR Regions as 'rgdal' SpatialPolygonsDataFrame objects.
-# Note: You will be prompted to read and agree to the ICES Data Policy before the download will begin.
-
+#' readSpatial.R
+#' Download and read data from the ICES Spatial Facility
+#' @param dataset, ...
+#' @return none
+#' @seealso none
+#' @details Reads ICES Statistical areas, ICES Statistical Rectangles,ICES Ecoregions, HELCOM sub-basins, or OSPAR Regions as 'rgdal' SpatialPolygonsDataFrame objects.
+#'   Note: You will be prompted to read and agree to the ICES Data Policy before the download will begin.
+#' @keywords download, spatial
+#' @examples \dontrun{
+#'  readSpatial(dataset = "ices_areas)
+#' }
+#' @export
 readSpatial <- function(dataset = c("ices_areas", "ices_rectangles",
                                     "ices_ecoregions", "helcom_subbasins",
                                     "ospar_regions"), ...) {
-  require(rgdal)
+  #library(rgdal)
   dataPolicy <- 
     "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~## DISCLAIMER AND COPYRIGHT ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
