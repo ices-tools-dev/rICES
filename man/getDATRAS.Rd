@@ -24,7 +24,13 @@ the update is slow, avoiding straining the server or client.
 }
 \examples{
 \dontrun{
- getDATRAS()
+ getDATRAS(record = "HH",
+           survey="NS-IBTS",
+           startyear = 2010,
+           endyear = 2011,
+           quarters = 1,
+           parallel = TRUE,
+           cores = 4)
 }
 }
 \seealso{
