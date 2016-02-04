@@ -57,11 +57,16 @@ getSummaryTable <- function(year = 2014) {
                       unique(keys$key))
     #
     allRefs <- data.frame()
+    # i = 63
     for(i in 1:length(refList)) { # Loop over all reference points tables and extract data
       refNames.i <-  xmlRoot(xmlTreeParse(refList[i], isURL = T))
       refDat <- xmlSApply(refNames.i[["FishSettingsList"]], xmlValue)
       refDat[sapply(refDat, function(x) length(x) == 0)] <- NA
-      allRefs <- rbind(allRefs, data.frame(t(refDat)))
+      refDat <- data.frame(t(refDat))
+      refDat$FMSY_type <- colnames(refDat[8])
+      refDat$MSYBtrigger_type <- colnames(refDat[9])
+      colnames(refDat)[c(8,9)] <- c("FMSY", "MSYBtrigger")
+      allRefs <- rbind(allRefs, refDat)
     } # Close i loop
     #
     # Clean up data
@@ -70,8 +75,7 @@ getSummaryTable <- function(year = 2014) {
     allRefs[, c("FishStockName")] <- sapply(allRefs[, c("FishStockName")], function(x) as.character(x))
     #
     summaryList <- paste0("http://standardgraphs.ices.dk/StandardGraphsWebServices.asmx/getSummaryTable?key=",
-                          keys$key[keys$Status == " Published " &
-                                     !keys$key %in% c(5411)])
+                          unique(keys$key))
     #
     summaryDat <- data.frame()
     for(j in 1:length(summaryList)) { # Loop over all published summary tables and extract data
