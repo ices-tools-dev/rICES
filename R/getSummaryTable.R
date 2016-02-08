@@ -12,7 +12,7 @@
 #' @export
 #
 #
-getSummaryTable <- function(year = 2014) {
+getSummaryTable <- function(year = 2015) {
   # If you want all stocks for all years, then make year == 0
   #
   dataPolicy <- 
@@ -71,7 +71,7 @@ getSummaryTable <- function(year = 2014) {
     #
     # Clean up data
     numColsRefs <- colnames(allRefs)[!colnames(allRefs) %in% c("FishStockName")]
-    allRefs[, numColsRefs] <- sapply(allRefs[, numColsRefs], function(x) as.numeric(x))
+    allRefs[, numColsRefs] <- suppressWarnings(sapply(allRefs[, numColsRefs], function(x) as.numeric(x)))
     allRefs[, c("FishStockName")] <- sapply(allRefs[, c("FishStockName")], function(x) as.character(x))
     #
     summaryList <- paste0("http://standardgraphs.ices.dk/StandardGraphsWebServices.asmx/getSummaryTable?key=",
@@ -105,7 +105,7 @@ getSummaryTable <- function(year = 2014) {
     #
     # Clean up data
     numCols <- colnames(summaryDat)[!colnames(summaryDat) %in% c("fishstock", "units", "Fage")]
-    summaryDat[, numCols] <- lapply(summaryDat[, numCols], function(x) as.numeric(x))
+    summaryDat[, numCols] <- suppressWarnings(lapply(summaryDat[, numCols], function(x) as.numeric(x)))
     summaryDat[, c("fishstock", "units", "Fage")] <- lapply(summaryDat[, c("fishstock", "units", "Fage")], function(x) as.character(x))
     #
     # Create new list with all summary tables and reference points
