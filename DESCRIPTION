@@ -7,7 +7,8 @@ Author: Scott Large [aut, cre]
 Maintainer: Scott Large <scott.large@ICES.dk>
 Description: This package provides general-purpose tools for aggregating data, calculating survey indices,
     and compiling common ICES outputs.
-Depends: R (>= 3.1.1), 
+Depends: R (>= 3.1.1),
+    plyr,
     doParallel,
     foreach,
     parallel,

@@ -1,4 +1,4 @@
-#' getStockSummary.R
+#' getSummaryTable.R
 
 #' ICES standard graph data extraction
 #' @param year
@@ -7,7 +7,7 @@
 #' @details none
 #' @keywords none
 #' @examples \dontrun{
-#' tt <- getSummaryTable()
+#' d <- getSummaryTable()
 #' }
 #' @export
 #
@@ -46,72 +46,87 @@ getSummaryTable <- function(year = 2015) {
   accepted <- ifelse(answer %in% c("YES", "NO"), "true", "false")
   #
   if(answer == "YES") {
-    keys <- data.table(t(xmlSApply(xmlRoot(xmlTreeParse(paste0("http://standardgraphs.ices.dk/StandardGraphsWebServices.asmx/getListStocks?year=",
+    keys <- data.frame(t(xmlSApply(xmlRoot(xmlTreeParse(paste0("http://standardgraphs.ices.dk/StandardGraphsWebServices.asmx/getListStocks?year=",
                                                                year),
                                                         isURL = T,
                                                         options = HUGE,
                                                         useInternalNodes =  T)),
-                                   function(x) xmlSApply(x, xmlValue))))
+                                   function(x) xmlSApply(x, xmlValue))), row.names = NULL)
     #
+    keys$Status <- gsub("[[:space:]]", "",  keys$Status)
+    #
+    colnames(keys)[colnames(keys) == "FishStockName"] <- "STOCKID"
     refList <- paste0("http://standardgraphs.ices.dk/StandardGraphsWebServices.asmx/getFishStockReferencePoints?key=",
-                      unique(keys$key))
+                      unique(keys$key[keys$Status == "Published"]))
     #
     allRefs <- data.frame()
-    # i = 63
     for(i in 1:length(refList)) { # Loop over all reference points tables and extract data
       refNames.i <-  xmlRoot(xmlTreeParse(refList[i], isURL = T))
       refDat <- xmlSApply(refNames.i[["FishSettingsList"]], xmlValue)
       refDat[sapply(refDat, function(x) length(x) == 0)] <- NA
-      refDat <- data.frame(t(refDat))
-      refDat$FMSY_type <- colnames(refDat[8])
-      refDat$MSYBtrigger_type <- colnames(refDat[9])
-      colnames(refDat)[c(8,9)] <- c("FMSY", "MSYBtrigger")
-      allRefs <- rbind(allRefs, refDat)
+      allRefs <- rbind.fill(allRefs, data.frame(t(refDat)))
     } # Close i loop
     #
     # Clean up data
+    allRefs <- data.frame(sapply(allRefs, function(x) ifelse(x == "NULL", NA, x)))
     numColsRefs <- colnames(allRefs)[!colnames(allRefs) %in% c("FishStockName")]
-    allRefs[, numColsRefs] <- suppressWarnings(sapply(allRefs[, numColsRefs], function(x) as.numeric(x)))
+    allRefs[, numColsRefs] <- sapply(allRefs[, numColsRefs], function(x) as.numeric(x))
     allRefs[, c("FishStockName")] <- sapply(allRefs[, c("FishStockName")], function(x) as.character(x))
+    colnames(allRefs)[colnames(allRefs) == "FishStockName"] <- "STOCKID"
     #
-    summaryList <- paste0("http://standardgraphs.ices.dk/StandardGraphsWebServices.asmx/getSummaryTable?key=",
-                          unique(keys$key))
+    summaryList <- data.frame(key = unique(keys$key[keys$Status == "Published"]),
+                              URL = paste0("http://standardgraphs.ices.dk/StandardGraphsWebServices.asmx/getSummaryTable?key=",
+                                           unique(keys$key[keys$Status == "Published"])))
     #
     summaryDat <- data.frame()
-    for(j in 1:length(summaryList)) { # Loop over all published summary tables and extract data
-      summaryNames <-  xmlRoot(xmlTreeParse(summaryList[j], isURL = T))
+    for(j in 1:nrow(summaryList)) { # Loop over all published summary tables and extract data
+      summaryNames <-  xmlRoot(xmlTreeParse(summaryList$URL[j], isURL = T))
       # Parse XML data and convert into a data frame
       xmlDat <- xmlSApply(summaryNames[["lines"]], function(x) xmlSApply(x, xmlValue))
       xmlDat[sapply(xmlDat, function(x) length(x) == 0)] <- NA
       dimnames(xmlDat)[2] <- NULL
-      summaryInfo <- data.frame(t(xmlDat))
+      summaryInfo <- data.frame(lapply(data.frame(t(xmlDat)), function(x) as.numeric(x)))
       #
       stockList <- names(summaryNames[names(summaryNames) != "lines"])
       stockValue <-  rbind(lapply(stockList, function(x) xmlSApply(summaryNames[[x]], xmlValue)))
       stockValue[sapply(stockValue, function(x) length(x) == 0)] <- NA
+      dimnames(stockValue)[2] <- NULL
+      stockValue <- data.frame(lapply(stockValue, function(x) as.character(x)), stringsAsFactors = F)
       colnames(stockValue) <- stockList
       #
       summaryInfo <- cbind(summaryInfo, stockValue)
       #
       if(any(colnames(summaryDat) %in% colnames(summaryInfo) |
-               any(colnames(summaryInfo) %in% colnames(summaryDat)))) {
+             any(colnames(summaryInfo) %in% colnames(summaryDat)))) {
         newDat <- colnames(summaryInfo)[!colnames(summaryInfo) %in% colnames(summaryDat)]
         summaryDat[,newDat] <- NA
         newInfo <- colnames(summaryDat)[!colnames(summaryDat) %in% colnames(summaryInfo)]
         summaryInfo[,newInfo] <- NA
       }
+      summaryInfo$key <- as.numeric(as.character(summaryList$key[j]))
       summaryDat <- rbind(summaryDat, summaryInfo)
     } # close j loop
     #
     # Clean up data
-    numCols <- colnames(summaryDat)[!colnames(summaryDat) %in% c("fishstock", "units", "Fage")]
-    summaryDat[, numCols] <- suppressWarnings(lapply(summaryDat[, numCols], function(x) as.numeric(x)))
-    summaryDat[, c("fishstock", "units", "Fage")] <- lapply(summaryDat[, c("fishstock", "units", "Fage")], function(x) as.character(x))
+    charCols <- c("fishstock", "units", "Fage", "stockSizeDescription", 
+                  "stockSizeUnits", "fishingPressureDescription", "fishingPressureUnits", "StockPublishNote")
+    numCols <- colnames(summaryDat)[!colnames(summaryDat) %in% charCols]
+    summaryDat[, numCols] <- lapply(summaryDat[, numCols], function(x) as.numeric(x))
+    summaryDat[, charCols] <- lapply(summaryDat[, charCols], function(x) as.character(x))
+    colnames(summaryDat)[colnames(summaryDat) == "fishstock"] <- "STOCKID"
     #
     # Create new list with all summary tables and reference points
-    newList <- list("summaryTable" = summaryDat, "referencePoints" = allRefs, "keys" = keys)
+    allRefs$STOCKID <- tolower(as.character(allRefs$STOCKID))
+    summaryDat$STOCKID <- tolower(as.character(summaryDat$STOCKID))
+    keys$STOCKID <- tolower(as.character(keys$STOCKID))  
     #
-    return(newList)
+    sTable <- merge(allRefs, keys, c("STOCKID", "AssessmentYear", "key"))
+    sTable <- merge(summaryDat, sTable, by = c("STOCKID", "AssessmentYear","key"))
+    #
+    # To facilitate adding guild information
+    sTable$speciesID <- tolower(gsub( "-.*$", "", as.character(sTable$STOCKID)))
+    #   
+    return(sTable)
   } # Close answer == YES if statement
   if(answer != "YES") {
     cat("To download data, you must read the ICES Data Policy and type 'yes' into the console window.")
