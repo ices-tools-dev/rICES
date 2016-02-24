@@ -5,9 +5,3 @@ export(getDATRAS)
 export(getSummaryTable)
 export(icesLogo)
 export(readSpatial)
-<<<<<<< HEAD
-importFrom(foreach,"%dopar%")
-importFrom(foreach,"%do%")
-=======
-importFrom(foreach,"%dopar%")
->>>>>>> 89d56be2193d7dcf810faa0bafd8009513b35079
