@@ -5,9 +5,11 @@ Authors@R: c(person("Scott", "Large", role = c("aut", "cre"),
              email = "scott.large@ICES.dk"))
 Author: Scott Large [aut, cre]
 Maintainer: Scott Large <scott.large@ICES.dk>
-Description: This package provides general-purpose tools for aggregating data, calculating survey indices,
-    and compiling common ICES outputs.
-Depends: R (>= 3.1.1),
+Description: This package provides general-purpose tools for aggregating data,
+    calculating survey indices, and compiling common ICES outputs.
+Depends:
+    R (>= 3.1.1)
+Imports:
     plyr,
     doParallel,
     foreach,
@@ -18,9 +20,11 @@ Depends: R (>= 3.1.1),
     FLCore,
     png,
     rgdal
-Suggests: ggplot2, 
+Suggests:
+    ggplot2,
     extrafont,
     knitr
 License: What license is it under?
 LazyData: true
 VignetteBuilder: knitr
+RoxygenNote: 5.0.1
