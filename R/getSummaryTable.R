@@ -1,7 +1,7 @@
 #' getSummaryTable.R
 
 #' ICES standard graph data extraction
-#' @param year
+#' @param year The year of summary data to be extracted
 #' @return none
 #' @seealso none
 #' @details none
