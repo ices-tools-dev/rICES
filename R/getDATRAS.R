@@ -78,11 +78,11 @@ getDATRAS <- function(record, survey, startyear, endyear, quarters, parallel = F
         rm(list=ls(name=env), pos=env)
       } # close unregister
       #
-      cl <- makeCluster(cores)
-      registerDoParallel(cores = cl)
+      cl <- parallel::makeCluster(cores)
+      doParallel::registerDoParallel(cores = cl)
       #
       temp = getURL
-      getDATA <- foreach(temp = getURL,
+      getDATA <- foreach::foreach(temp = getURL,
                        .combine = function(...) rbindlist(list(...), fill = TRUE),
                        .multicombine = T,
                        .inorder = F,
@@ -91,12 +91,12 @@ getDATRAS <- function(record, survey, startyear, endyear, quarters, parallel = F
                          data.table(t(xmlSApply(xmlRoot(xmlTreeParse(temp, isURL = T, options = HUGE, useInternalNodes =  T)),
                                                 function(x) xmlSApply(x, xmlValue))))
                        } # close foreach %dopar%
-      stopCluster(cl)
+      parallel::stopCluster(cl)
       unregister()
       } # close parallel == TRUE
       #
     if(parallel == FALSE) {
-      getDATA <- foreach(temp = getURL,
+      getDATA <- foreach::foreach(temp = getURL,
                        .combine = function(...) rbindlist(list(...), fill = TRUE),
                        .multicombine=T,
                        .inorder=F,
