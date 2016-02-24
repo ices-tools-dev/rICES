@@ -46,12 +46,12 @@ getSummaryTable <- function(year = 2015) {
   accepted <- ifelse(answer %in% c("YES", "NO"), "true", "false")
   #
   if(answer == "YES") {
-    keys <- data.frame(t(xmlSApply(xmlRoot(xmlTreeParse(paste0("http://standardgraphs.ices.dk/StandardGraphsWebServices.asmx/getListStocks?year=",
+    keys <- data.frame(t(XML::xmlSApply(XML::xmlRoot(XML::xmlTreeParse(paste0("http://standardgraphs.ices.dk/StandardGraphsWebServices.asmx/getListStocks?year=",
                                                                year),
                                                         isURL = T,
                                                         options = HUGE,
                                                         useInternalNodes =  T)),
-                                   function(x) xmlSApply(x, xmlValue))), row.names = NULL)
+                                   function(x) XML::xmlSApply(x, XML::xmlValue))), row.names = NULL)
     #
     keys$Status <- gsub("[[:space:]]", "",  keys$Status)
     #
@@ -61,10 +61,10 @@ getSummaryTable <- function(year = 2015) {
     #
     allRefs <- data.frame()
     for(i in 1:length(refList)) { # Loop over all reference points tables and extract data
-      refNames.i <-  xmlRoot(xmlTreeParse(refList[i], isURL = T))
-      refDat <- xmlSApply(refNames.i[["FishSettingsList"]], xmlValue)
+      refNames.i <-  XML::xmlRoot(XML::xmlTreeParse(refList[i], isURL = T))
+      refDat <- XML::xmlSApply(refNames.i[["FishSettingsList"]], XML::xmlValue)
       refDat[sapply(refDat, function(x) length(x) == 0)] <- NA
-      allRefs <- rbind.fill(allRefs, data.frame(t(refDat)))
+      allRefs <- plyr::rbind.fill(allRefs, data.frame(t(refDat)))
     } # Close i loop
     #
     # Clean up data
@@ -80,15 +80,15 @@ getSummaryTable <- function(year = 2015) {
     #
     summaryDat <- data.frame()
     for(j in 1:nrow(summaryList)) { # Loop over all published summary tables and extract data
-      summaryNames <-  xmlRoot(xmlTreeParse(summaryList$URL[j], isURL = T))
+      summaryNames <-  XML::xmlRoot(XML::xmlTreeParse(summaryList$URL[j], isURL = T))
       # Parse XML data and convert into a data frame
-      xmlDat <- xmlSApply(summaryNames[["lines"]], function(x) xmlSApply(x, xmlValue))
+      xmlDat <- XML::xmlSApply(summaryNames[["lines"]], function(x) XML::xmlSApply(x, XML::xmlValue))
       xmlDat[sapply(xmlDat, function(x) length(x) == 0)] <- NA
       dimnames(xmlDat)[2] <- NULL
       summaryInfo <- data.frame(lapply(data.frame(t(xmlDat)), function(x) as.numeric(x)))
       #
       stockList <- names(summaryNames[names(summaryNames) != "lines"])
-      stockValue <-  rbind(lapply(stockList, function(x) xmlSApply(summaryNames[[x]], xmlValue)))
+      stockValue <-  rbind(lapply(stockList, function(x) XML::xmlSApply(summaryNames[[x]], XML::xmlValue)))
       stockValue[sapply(stockValue, function(x) length(x) == 0)] <- NA
       dimnames(stockValue)[2] <- NULL
       stockValue <- data.frame(lapply(stockValue, function(x) as.character(x)), stringsAsFactors = F)
