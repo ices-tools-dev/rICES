@@ -82,7 +82,7 @@ getDATRAS <- function(record, survey, startyear, endyear, quarters, parallel = F
       registerDoParallel(cores = cl)
       #
       temp = getURL
-      getDATA <- foreach(temp = getURL,
+      getDATA <- foreach::foreach(temp = getURL,
                        .combine = function(...) rbindlist(list(...), fill = TRUE),
                        .multicombine = T,
                        .inorder = F,
@@ -96,7 +96,7 @@ getDATRAS <- function(record, survey, startyear, endyear, quarters, parallel = F
       } # close parallel == TRUE
       #
     if(parallel == FALSE) {
-      getDATA <- foreach(temp = getURL,
+      getDATA <- foreach::foreach(temp = getURL,
                        .combine = function(...) rbindlist(list(...), fill = TRUE),
                        .multicombine=T,
                        .inorder=F,
