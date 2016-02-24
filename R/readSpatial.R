@@ -7,7 +7,7 @@
 #'   Note: You will be prompted to read and agree to the ICES Data Policy before the download will begin.
 #' @keywords download, spatial
 #' @examples \dontrun{
-#'  readSpatial(dataset = "ices_areas)
+#'  readSpatial(dataset = "ices_areas")
 #' }
 #' @export
 readSpatial <- function(dataset = c("ices_areas", "ices_rectangles",
