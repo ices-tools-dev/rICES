@@ -1,31 +1,34 @@
-#' getDATRASfun.R
+#' getDATRAS.R
 
-#' Extracts age data files from DATRAS
-#' @param record, survey, startyear, endyear, startquarter, endquarter, parallel = FALSE, cores = NULL
+#' Downloads and parses data from ICES DATRAS database using web services
+#' @param record, survey, startyear, endyear, startquarter, endquarter, parallel = FALSE, cores = NULL, time = NULL
 #' @return none
 #' @seealso none
-#' @details the update is slow, avoiding straining the server or client.
-#'   please allow this call to run overnight for a complete upgrade.
+#' @details none
 #' @keywords download, DATRAS, survey, age, length
 #' @examples \dontrun{
-#'  getDATRAS(record = "HH",
-#'            survey="NS-IBTS",
-#'            startyear = 2010,
-#'            endyear = 2011,
-#'            quarters = 1,
-#'            parallel = TRUE,
-#'            cores = 4)
+#'  getDATRAS(record = "HL", 
+#'            survey = "NS-IBTS", 
+#'            startyear = 2010, 
+#'            endyear = 2010, 
+#'            quarters = 1, 
+#'            parallel = FALSE,
+#'            cores = NULL,
+#'            time = NULL)
 #' }
 #' @export
 #
-getDATRAS <- function(record, survey, startyear, endyear, quarters, parallel = FALSE, cores = NULL) {
-  #   library(XML)
-  #   library(doParallel)
-  #   library(parallel)
-  #   library(foreach)
-  #   library(data.table)
+getDATRAS <- function(record = "HL",
+                      survey = "NS-IBTS", 
+                      startyear = 2015, 
+                      endyear = 2015, 
+                      quarters = 1, 
+                      parallel = TRUE, 
+                      cores = 4, 
+                      time = TRUE) {
+  # 
   dataPolicy <- 
-"  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    "  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~## DISCLAIMER AND COPYRIGHT ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
   ### This dataset is for the sole use of the organisation or individual downloading this dataset. ###
@@ -48,68 +51,111 @@ getDATRAS <- function(record, survey, startyear, endyear, quarters, parallel = F
   ### The use of data must comply with the ICES data policy. The full ICES Data Policy             ###
   ### can be accessed on this link:                                                                ###  
   ### http://www.ices.dk/marine-data/guidelines-and-policy/Pages/ICES-data-policy.aspx             ###
+  ###                                                                                              ###
+  ### By continuing, the user implicitly accepts and agrees to the terms of the ICES Data Policy   ###
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#"
   #
   cat(dataPolicy)
-  answer <- toupper(readline(prompt = "I accept the ICES Data Policy: "))
-  accepted <- ifelse(answer %in% c("YES", "NO"), "true", "false")
   #
-  if(answer == "YES") {
-    strt <- Sys.time()
+  seqYear <- startyear:endyear
+  #
+  if(!record %in% c("HL", "HH", "CA")) {
+    stop("Please specify record type: HH (haul meta-data),
+                                            HL (Species length-based data),
+                                             CA (species age-based data)")
+  } # close record catch
+  # 
+  # Create list of web service URLs
+  getURL <- apply(expand.grid(record, survey, seqYear, quarters),
+                  1,
+                  function(x) paste0("http://datras.ices.dk/WebServices/DATRASWebService.asmx/get",
+                                     x[1],
+                                     "data?survey=", x[2],
+                                     "&year=", x[3],
+                                     "&quarter=", x[4]))
+  # 
+  # Download web service responses into a list of "iter" objects for parallel parsing 
+  downloadStart <- proc.time()
+  listURL <-  iterators::iter(lapply(getURL, httr::GET))
+  downloadFinish <- proc.time()
+  #
+  if(parallel == TRUE) {
+    # 
+    if(missing("cores")) {
+      stop("Please specify how many cores you wish to devote to this task.")
+    } # Close cores catch
     #
-    seqYear <- startyear:endyear
+    unregister <- function() {
+      env <- foreach:::.foreachGlobals
+      rm(list=ls(name=env), pos=env)
+    } # close unregister function
     #
-    if(!record %in% c("HL", "HH", "CA") ) stop("Please specify record type: HH (haul meta-data),
-                                               HL (Species length-based data),
-                                               CA (species age-based data)")
-    getURL <- apply(expand.grid(record, survey, seqYear, quarters),
-                      1,
-                      function(x) paste0("http://datras.ices.dk/WebServices/DATRASWebService.asmx/get",
-                                         x[1],
-                                         "data?survey=", x[2],
-                                         "&year=", x[3],
-                                         "&quarter=", x[4]))
+    cl <- parallel::makeCluster(cores)
+    doParallel::registerDoParallel(cores = cl)
     #
-    if(parallel == TRUE) {
-      if(missing("cores")) stop("Please specify how many cores you wish to devote to this task.")
-      #
-      unregister <- function() {
-        env <- foreach:::.foreachGlobals
-        rm(list=ls(name=env), pos=env)
-      } # close unregister
-      #
-      cl <- parallel::makeCluster(cores)
-      doParallel::registerDoParallel(cores = cl)
-      #
-      temp = getURL
-      getDATA <- foreach::foreach(temp = getURL,
-                       .combine = function(...) rbindlist(list(...), fill = TRUE),
-                       .multicombine = T,
-                       .inorder = F,
-                       .maxcombine = 1000,
-                       .packages = c("XML", "data.table")) %dopar% {
-                         data.table(t(xmlSApply(xmlRoot(xmlTreeParse(temp, isURL = T, options = HUGE, useInternalNodes =  T)),
-                                                function(x) xmlSApply(x, xmlValue))))
-                       } # close foreach %dopar%
-      parallel::stopCluster(cl)
-      unregister()
-      } # close parallel == TRUE
-      #
-    if(parallel == FALSE) {
-      getDATA <- foreach::foreach(temp = getURL,
-                       .combine = function(...) rbindlist(list(...), fill = TRUE),
-                       .multicombine=T,
-                       .inorder=F,
-                       .maxcombine=1000,
-                       .packages = c("XML", "data.table")) %do% {
-                         data.table(t(xmlSApply(xmlRoot(xmlTreeParse(temp, isURL = T, options = HUGE, useInternalNodes =  T)),
-                                                function(x) xmlSApply(x, xmlValue))))
-                         } # close foreach %do%
-      } # close parallel == FALSE
-    print(Sys.time()-strt)
-    return(getDATA)
-    } #  Close answer == YES if statement 
-  if(answer != "YES") {
-    cat("To download data, you must read the ICES Data Policy and type 'yes' into the console window.")
-    } # Close answer != YES if statement
-} # close function
+  } # Close parallel == TRUE
+  # 
+  # Register a sequential backend
+  if(parallel == FALSE) {
+    foreach::registerDoSEQ()
+  } # Close parallel == FALSE
+  # 
+  getDATA <- foreach::foreach(temp = listURL,
+                              .combine = dplyr::bind_rows,
+                              .multicombine = TRUE,
+                              .inorder = TRUE,
+                              .maxcombine = 1000,
+                              .packages = c("httr", "xml2", "dplyr")) %dopar% {
+                                #
+                                x <- temp %>%
+                                  httr::content(as = "parsed",
+                                                type = "text/xml",
+                                                isURL = T, # Check if these options matter
+                                                options = HUGE,
+                                                useInternalNodes =  T) %>%
+                                  xml2::xml_children()
+                                var.names <- tolower(xml2::xml_name(xml2::xml_children(x[[1]])))
+                                n.col <- length(var.names)
+                                # 
+                                x <-
+                                  x %>%
+                                  xml2::xml_text() %>%
+                                  stringr::str_replace_all("\\n", "\t") %>%
+                                  stringr::str_replace_all(" +", "") %>%
+                                  read.table(text = .,
+                                             sep = "\t",
+                                             na.strings = c("-9.0000",
+                                                            "-9.000",
+                                                            "-9.00",
+                                                            "-9.0",
+                                                            "-9"),
+                                             stringsAsFactors = FALSE)
+                                # 
+                                x <- data.frame(x[, c(2:(ncol(x) - 1))])
+                                colnames(x) <- var.names
+                                # 
+                                if(toupper(record) == "HH") {
+                                  x$timeshot <- as.character(x$timeshot)
+                                  i <- nchar(x$timeshot) == 3
+                                  if(any(i)) x$timeshot[i] <- paste0("0", x$timeshot[i])
+                                } ## HH timeshot
+                                return(x)
+                              } # close %dopar%
+  if(parallel == TRUE){
+    parallel::stopCluster(cl = cl)
+    unregister()
+  } # close parallel == TRUE
+  # 
+  parseFinish <- proc.time()
+  # 
+  if(time) {
+    cat("\nDownload time: \n")
+    print(downloadFinish - downloadStart)
+    cat("\n Parse time: \n")
+    print(parseFinish - downloadFinish)
+    cat("\n Total time: \n")
+    print(parseFinish - downloadStart)
+  }
+  #
+  return(getDATA)
+} # close getDATRAS function

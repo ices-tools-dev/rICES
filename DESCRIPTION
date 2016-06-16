@@ -19,7 +19,12 @@ Imports:
     RCurl,
     FLCore,
     png,
-    rgdal
+    rgdal,
+    xml2,
+    dplyr, 
+    httr,
+    iterators,
+    stringr
 Suggests:
     ggplot2,
     extrafont,
